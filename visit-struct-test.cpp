@@ -40,11 +40,7 @@ VISITABLE_STRUCT(Z, z0, z1, z2);
 VISITABLE_STRUCT(A, m, n, o);
 VISITABLE_STRUCT(B, a, b, c, d, e);
 
-// template <typename T, std::enable_if_t(!std::is_base_of<visit_struct::visitable_base, T>::value = 0)
-
 struct printer {
-	// printer(int d = 0) : depth(d) {}
-
 	void operator()(const char* field, Vec3 vec)
 	{
 		std::cout << field << " = (" << vec.x << ", " << vec.y << ", " << vec.z << ")" << std::endl;
@@ -81,22 +77,9 @@ struct printer {
 	int depth = 0;
 };
 
- 
-
 int main()
 {
 	B b{ 1, 2.0f, "hello", {3.0f, 4.0f, 5.0f}, {6, 7.0f, {8, 9.0f, "world"}} };
 	printer p;
 	visit_struct::for_each(b, p);
 }
-
-// Run program: Ctrl + F5 or Debug > Start Without Debugging menu
-// Debug program: F5 or Debug > Start Debugging menu
-
-// Tips for Getting Started: 
-//   1. Use the Solution Explorer window to add/manage files
-//   2. Use the Team Explorer window to connect to source control
-//   3. Use the Output window to see build output and other messages
-//   4. Use the Error List window to view errors
-//   5. Go to Project > Add New Item to create new code files, or Project > Add Existing Item to add existing code files to the project
-//   6. In the future, to open this project again, go to File > Open > Project and select the .sln file
