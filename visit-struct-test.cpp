@@ -43,9 +43,7 @@ VISITABLE_STRUCT(B, a, b, c, d, e);
 // template <typename T, std::enable_if_t(!std::is_base_of<visit_struct::visitable_base, T>::value = 0)
 
 struct printer {
-
-	printer
-
+	// printer(int d = 0) : depth(d) {}
 
 	void operator()(const char* field, Vec3 vec)
 	{
@@ -56,12 +54,14 @@ struct printer {
 	template <typename T, std::enable_if_t<std::is_arithmetic<T>::value>* = nullptr>
 	void operator()(const char* field, const T& value)
 	{
+		for (int i = 0; i < depth; i++) std::cout << "  ";
 		std::cout << field << " = " << value << std::endl;
 	}
 
 	// Strings
 	void operator()(const char* field, const std::string& value)
 	{
+		for (int i = 0; i < depth; i++) std::cout << "  ";
 		std::cout << field << " = \"" << value << "\"" << std::endl;
 	}
 	
@@ -69,19 +69,14 @@ struct printer {
 	template <typename T, typename = std::enable_if_t<visit_struct::traits::is_visitable<T>::value>>
 	void operator()(const char* field, const T& value)
 	{
+		for (int i = 0; i < depth; i++) std::cout << "  ";
 		std::cout << field << " = {" << std::endl;
+		depth++;
 		visit_struct::for_each(value, *this);
+		depth--;
+		for (int i = 0; i < depth; i++) std::cout << "  ";
 		std::cout << "}" << std::endl;
 	}
-
-	/*
-	template <typename T, typename = std::enable_if_t<visit_struct::traits::is_visitable<T>>::vallue = 0>
-	void operator()(const char* field, const T& value)
-	{
-		printer p;
-		visit_struct::for_each(value, p);
-	}
-	*/
 
 	int depth = 0;
 };
