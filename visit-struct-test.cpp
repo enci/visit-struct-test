@@ -2,10 +2,11 @@
 //
 
 #include <iostream>
-#
+#include <fstream>
 
 #include "visit_struct.hpp"
 #include "visit_struct_intrusive.hpp"
+#include "json.hpp"
 
 struct Vec3
 {
@@ -77,9 +78,51 @@ struct printer {
 	int depth = 0;
 };
 
+struct to_json {
+	to_json() : json(nlohmann::json::object()) {}
+
+	void operator()(const char* field, Vec3 vec)
+	{
+		json[field] = { vec.x, vec.y, vec.z };
+	}
+
+	// Primitive types
+	template <typename T, std::enable_if_t<std::is_arithmetic<T>::value>* = nullptr>
+	void operator()(const char* field, const T& value)
+	{
+		json[field] = value;
+	}
+
+	// Strings
+	void operator()(const char* field, const std::string& value)
+	{
+		json[field] = value;
+	}
+
+	// Structs
+	template <typename T, typename = std::enable_if_t<visit_struct::traits::is_visitable<T>::value>>
+	void operator()(const char* field, const T& value)
+	{
+		to_json tj;
+		visit_struct::for_each(value, tj);
+		json[field] = tj.json;
+	}
+
+	nlohmann::json json;
+};
+
 int main()
 {
 	B b{ 1, 2.0f, "hello", {3.0f, 4.0f, 5.0f}, {6, 7.0f, {8, 9.0f, "world"}} };
 	printer p;
 	visit_struct::for_each(b, p);
+
+	to_json tj;
+	visit_struct::for_each(b, tj);
+
+	std::ofstream out("output.json");
+	out << tj.json.dump(4) << std::endl;
+
+
+	// std::cout << tj.json.dump(4) << std::endl;
 }

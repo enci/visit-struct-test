@@ -130,6 +130,7 @@
     <ClCompile Include="visit-struct-test.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="json.hpp" />
     <ClInclude Include="visit_struct.hpp" />
     <ClInclude Include="visit_struct_intrusive.hpp" />
   </ItemGroup>
